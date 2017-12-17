@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-"
+
 import sqlite3
 
 
@@ -13,9 +15,13 @@ class LiteDb:
         try:
             self.con = sqlite3.connect(db_name)
             self.cursor = self.con.cursor()
-        except sqlite3.OperationalError:
-            self.cursor.execute('CREATE TABLE apartments (id INTEGER PRIMARY KEY, url VARCHAR(100), price VARCHAR(30), '
+            self.cursor.execute('CREATE TABLE IF NOT EXISTS apartments (id INTEGER PRIMARY KEY, url VARCHAR(100), price VARCHAR(30), '
                                 'phone VARCHAR(30), ap_name VARCHAR(300), owner VARCHAR(100), about VARCHAR(5000))')
+            print("SDELALI TABLE!")
+            self.con.commit()
+            print("SDELALI COMMIT")
+        except sqlite3.OperationalError:
+            print("EXCEPPPT!")
 
     def execute_sql(self, sql):
         """Method to execute sql-rows
@@ -64,9 +70,10 @@ class ApartmentsDb:
                                                                         owner=owner,
                                                                         about=about))
         self.con.commit()
-        return self.cursor.lastrowid()
+        #return self.cursor.lastrowid()
 
     def get_apartments(self):
+        """Method to get all apartments from BD"""
         self.cursor.execute('SELECT * FROM apartments')
         self.con.commit()
         return self.cursor.fetchall()

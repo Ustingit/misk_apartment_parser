@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-"
+
 import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
@@ -69,6 +71,7 @@ def main():
         log.write("!!!!!!!!!!!!!!!!!!!!!!!!!  \n\n")
     finally:
         log.close()
+        db.con.close()
 
 
 if __name__ == '__main__':
