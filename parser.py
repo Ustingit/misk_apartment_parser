@@ -41,14 +41,14 @@ def main():
                 bad_apartment = apartment
                 title = apartment.find("p", class_="title")
                 ap_url = title.find("a")['href']
-                ap_id = ap_url.split("id")[1].replace("/", "", 2)
+                ap_id = ap_url.split("id")[1].replace("/", "", 2).replace('"', '').replace("'", "")
                 log.write(str(i) + ") " + str(ap_url) + "\n")
                 log.write("apartment id: " + ap_id + "\n")
                 price = title.find("span").contents[0]
                 log.write("price: " + str(price) + "\n")
                 phone = apartment.find("span", class_="phones").find("img")['src']
                 log.write("tel: " + str(phone) + "\n")
-                ap_name = title.find("a").contents[0]
+                ap_name = title.find("a").contents[0].replace('"', '').replace("'", "")
                 log.write("name: " + str(ap_name) + "\n")
                 owner = apartment.find("span", class_="phones").parent.contents[1]
                 log.write("owner: " + str(owner) + "\n")
@@ -58,11 +58,13 @@ def main():
                 log.write(about)
                 log.write("\n------------------------------\n")
                 i += 1
-
+                print("seichas v base: " + str(db.get_apartments()))
                 db.add_apartment(ap_id=ap_id, url=ap_url, price=price, phone=phone,
-                                 ap_name=ap_name, owner=owner, about=about)
+                                 ap_name=ap_name, owner=owner, about=about.replace('"', '', 100).replace("'", "", 100))
+                print("poka zapisali: " + str(db.get_apartments()))
 
-        log.write(db.get_apartments())
+
+        log.write(str(db.get_apartments()))
 
     except AttributeError:
         log.write("\n\n")

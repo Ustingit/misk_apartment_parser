@@ -15,11 +15,10 @@ class LiteDb:
         try:
             self.con = sqlite3.connect(db_name)
             self.cursor = self.con.cursor()
-            self.cursor.execute('CREATE TABLE IF NOT EXISTS apartments (id INTEGER PRIMARY KEY, url VARCHAR(100), price VARCHAR(30), '
+            self.cursor.execute('CREATE TABLE IF NOT EXISTS apartments (id INTEGER, url VARCHAR(100), price VARCHAR(30), '
                                 'phone VARCHAR(30), ap_name VARCHAR(300), owner VARCHAR(100), about VARCHAR(5000))')
             print("SDELALI TABLE!")
             self.con.commit()
-            print("SDELALI COMMIT")
         except sqlite3.OperationalError:
             print("EXCEPPPT!")
 
@@ -59,17 +58,23 @@ class ApartmentsDb:
         Returns:
             ap_id: id of added apartment.
         """
-        self.cursor.execute('INSERT INTO apartments '
-                            '(id, url, price, phone, ap_name, owner, about) '
-                            'VALUES({id}, "{url}", "{price}", "{phone}", '
-                            '"{ap_name}", "{owner}", "{about}")'.format(id=ap_id,
-                                                                        url=url,
-                                                                        price=price,
-                                                                        phone=phone,
-                                                                        ap_name=ap_name,
-                                                                        owner=owner,
-                                                                        about=about))
-        self.con.commit()
+        try:
+            self.cursor.execute('INSERT INTO apartments '
+                                '(id, url, price, phone, ap_name, owner, about) '
+                                'VALUES({id}, "{url}", "{price}", "{phone}", '
+                                '"{ap_name}", "{owner}", "{about}")'.format(id=ap_id,
+                                                                            url=url,
+                                                                            price=price,
+                                                                            phone=phone,
+                                                                            ap_name=ap_name,
+                                                                            owner=owner,
+                                                                            about=about))
+            self.con.commit()
+        except sqlite3.IntegrityError:
+            print("ZAPIS S TAKIM AIDI UCHE EST!")
+            self.cursor.execute('select * from apartments where id = {id}'.format(id=ap_id))
+            print(self.cursor.fetchall())
+            print("ZAPIS S TAKIM AIDI UCHE EST!END")
         #return self.cursor.lastrowid()
 
     def get_apartments(self):
