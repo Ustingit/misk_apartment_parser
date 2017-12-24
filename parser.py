@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 import os
 import dblite
+import unixNotifier
 
 # url = 'https://r.onliner.by/ak/?price[min]=50&price[max]=120&currency=usd#bounds[lb][lat]=53.767789993998804&bounds[lb][long]=27.36625671386719&bounds[rt][lat]=54.02794011027586&bounds[rt][long]=27.757644653320316'
 # def main():
@@ -21,6 +22,7 @@ import dblite
 
 
 def parse_kvartirant_apartments():
+    notif = unixNotifier.UnixNotifier("There is new apartment in Minsk (from kvartirant):")
     url = "https://www.kvartirant.by/ads/rooms/type/rent/?tx_uedbadsboard_pi1%5Bsearch%5D%5Bq%5D=&tx_uedbadsboard_pi1%5Bsearch%5D%5Bdistrict%5D=80&tx_uedbadsboard_pi1%5Bsearch%5D%5Bprice%5D%5Bfrom%5D=80&tx_uedbadsboard_pi1%5Bsearch%5D%5Bprice%5D%5Bto%5D=130&tx_uedbadsboard_pi1%5Bsearch%5D%5Bcurrency%5D=840&tx_uedbadsboard_pi1%5Bsearch%5D%5Bdate%5D=2592000&tx_uedbadsboard_pi1%5Bsearch%5D%5Bowner%5D=on&tx_uedbadsboard_pi1%5Bsearch%5D%5Bremember%5D=1"
     data = requests.get(url)
     assert data.status_code == 200
@@ -60,6 +62,7 @@ def parse_kvartirant_apartments():
                 log.write("\n------------------------------\n")
                 i += 1
                 if ap_id not in exist_aps:
+                    notif.notify(ap_url)
                     db.add_apartment(ap_id=ap_id, url=ap_url, price=price, phone=phone,
                                      ap_name=ap_name, owner=owner, about=about.replace('"', '', 100).replace("'", "", 100))
 
@@ -73,5 +76,9 @@ def parse_kvartirant_apartments():
         db.con.close()
 
 
+def qwe():
+    unixNotifier.UnixNotifier("There is new apartment in Minsk:").notify(dblite.ApartmentsDb().get_apartments()[0][1])
+
+
 if __name__ == '__main__':
-    parse_kvartirant_apartments()
+    qwe()
