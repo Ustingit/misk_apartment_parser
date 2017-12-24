@@ -17,10 +17,9 @@ class LiteDb:
             self.cursor = self.con.cursor()
             self.cursor.execute('CREATE TABLE IF NOT EXISTS apartments (id INTEGER, url VARCHAR(100), price VARCHAR(30), '
                                 'phone VARCHAR(30), ap_name VARCHAR(300), owner VARCHAR(100), about VARCHAR(5000))')
-            print("SDELALI TABLE!")
             self.con.commit()
         except sqlite3.OperationalError:
-            print("EXCEPPPT!")
+            print("EXCEPPPT DURING CREATING TABLE!")
 
     def execute_sql(self, sql):
         """Method to execute sql-rows
@@ -75,10 +74,15 @@ class ApartmentsDb:
             self.cursor.execute('select * from apartments where id = {id}'.format(id=ap_id))
             print(self.cursor.fetchall())
             print("ZAPIS S TAKIM AIDI UCHE EST!END")
-        #return self.cursor.lastrowid()
 
     def get_apartments(self):
         """Method to get all apartments from BD"""
         self.cursor.execute('SELECT * FROM apartments')
         self.con.commit()
         return self.cursor.fetchall()
+
+    def get_exist_apartments_ids(self):
+        """Method to get apartment's ids from BD"""
+        self.cursor.execute('SELECT id FROM apartments')
+        self.con.commit()
+        return [i[0] for i in self.cursor.fetchall()]

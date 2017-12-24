@@ -20,30 +20,31 @@ import dblite
 #     # apartments = div.select("a[href*=https://r.onliner.by/ak/apartments/]")
 
 
-def main():
+def parse_kvartirant_apartments():
     url = "https://www.kvartirant.by/ads/rooms/type/rent/?tx_uedbadsboard_pi1%5Bsearch%5D%5Bq%5D=&tx_uedbadsboard_pi1%5Bsearch%5D%5Bdistrict%5D=80&tx_uedbadsboard_pi1%5Bsearch%5D%5Bprice%5D%5Bfrom%5D=80&tx_uedbadsboard_pi1%5Bsearch%5D%5Bprice%5D%5Bto%5D=130&tx_uedbadsboard_pi1%5Bsearch%5D%5Bcurrency%5D=840&tx_uedbadsboard_pi1%5Bsearch%5D%5Bdate%5D=2592000&tx_uedbadsboard_pi1%5Bsearch%5D%5Bowner%5D=on&tx_uedbadsboard_pi1%5Bsearch%5D%5Bremember%5D=1"
     data = requests.get(url)
     assert data.status_code == 200
     soup = BeautifulSoup(data.text, 'html.parser')
     apartments = soup.find("table", class_="ads_list_table").findAll("tr")
 
-    path = os.getcwd()
-    log = open(path + "/parser_log.txt", "w")
+    log = open(os.getcwd() + "/parser_log.txt", "w")
     log.write("TRY " + str(datetime.now().strftime('%Y-%m-%d %H:%M:%S')) + "\n\n\n")
     bad_apartment = None
 
     db = dblite.ApartmentsDb()
 
     try:
+        exist_aps = db.get_exist_apartments_ids()
+
         i = 1
         for apartment in apartments:
             if "https://a.realt.by/www/delivery/ajs.php" not in str(apartment):
                 bad_apartment = apartment
                 title = apartment.find("p", class_="title")
                 ap_url = title.find("a")['href']
-                ap_id = ap_url.split("id")[1].replace("/", "", 2).replace('"', '').replace("'", "")
+                ap_id = int(ap_url.split("id")[1].replace("/", "", 2).replace('"', '').replace("'", ""))
                 log.write(str(i) + ") " + str(ap_url) + "\n")
-                log.write("apartment id: " + ap_id + "\n")
+                log.write("apartment id: " + str(ap_id) + "\n")
                 price = title.find("span").contents[0]
                 log.write("price: " + str(price) + "\n")
                 phone = apartment.find("span", class_="phones").find("img")['src']
@@ -54,17 +55,13 @@ def main():
                 log.write("owner: " + str(owner) + "\n")
                 log.write("about: ")
                 about = ''.join(str(p.contents[0]).replace('<span class="rooms">', '')
-                                  .replace('</span>', '').strip() for p in apartment.findAll("p", class_=None)[:-1])
+                                .replace('</span>', '').strip() for p in apartment.findAll("p", class_=None)[:-1])
                 log.write(about)
                 log.write("\n------------------------------\n")
                 i += 1
-                print("seichas v base: " + str(db.get_apartments()))
-                db.add_apartment(ap_id=ap_id, url=ap_url, price=price, phone=phone,
-                                 ap_name=ap_name, owner=owner, about=about.replace('"', '', 100).replace("'", "", 100))
-                print("poka zapisali: " + str(db.get_apartments()))
-
-
-        log.write(str(db.get_apartments()))
+                if ap_id not in exist_aps:
+                    db.add_apartment(ap_id=ap_id, url=ap_url, price=price, phone=phone,
+                                     ap_name=ap_name, owner=owner, about=about.replace('"', '', 100).replace("'", "", 100))
 
     except AttributeError:
         log.write("\n\n")
@@ -77,4 +74,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    parse_kvartirant_apartments()
