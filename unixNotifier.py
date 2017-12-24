@@ -34,7 +34,3 @@ class UnixNotifier:
         notifier.set_urgency(self.urgency)
         notifier.set_timeout(self.timeout)
         notifier.show()
-
-
-UnixNotifier("There is new apartment in Minsk:").notify("Skr-skr")
-

@@ -7,19 +7,6 @@ import os
 import dblite
 import unixNotifier
 
-# url = 'https://r.onliner.by/ak/?price[min]=50&price[max]=120&currency=usd#bounds[lb][lat]=53.767789993998804&bounds[lb][long]=27.36625671386719&bounds[rt][lat]=54.02794011027586&bounds[rt][long]=27.757644653320316'
-# def main():
-#     headers = {"Content-Type": "Application/json", "User-Agent": "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) Gecko/20091102 Firefox/3.5.5 (.NET CLR 3.5.30729)"}
-#     data = requests.get(url)
-#     print(data.text)
-#     assert data.status_code == 200
-#     soup = BeautifulSoup(data.text, 'html.parser')
-#     apartments = soup.find_all("a", href=lambda href: href and "https://r.onliner.by/ak/apartments/" in href)
-#     for i in apartments:
-#         print("A: " + str(i))
-#         print("-----------------")
-#     # apartments = div.select("a[href*=https://r.onliner.by/ak/apartments/]")
-
 
 def parse_kvartirant_apartments():
     notif = unixNotifier.UnixNotifier("There is new apartment in Minsk (from kvartirant):")
@@ -76,9 +63,41 @@ def parse_kvartirant_apartments():
         db.con.close()
 
 
-def qwe():
-    unixNotifier.UnixNotifier("There is new apartment in Minsk:").notify(dblite.ApartmentsDb().get_apartments()[0][1])
+def qwe(): pass
 
 
 if __name__ == '__main__':
     qwe()
+
+
+
+
+
+
+
+
+# Print out the results to screen
+    # for t in findPatTitle:
+    #     pic_name = os.path.basename(t)
+    #     with contextlib.closing(urlopen(t, 'rb')) as pic:
+    #         p = pic.read()
+    #         if len(p) > 1000:
+    #             print
+    #             t  # The title
+    #             with open(pic_name, 'wb') as of:
+    #                 of.write(p)
+    #             webbrowser.open(pic_name)
+
+
+# url = 'https://r.onliner.by/ak/?price[min]=50&price[max]=120&currency=usd#bounds[lb][lat]=53.767789993998804&bounds[lb][long]=27.36625671386719&bounds[rt][lat]=54.02794011027586&bounds[rt][long]=27.757644653320316'
+# def main():
+#     headers = {"Content-Type": "Application/json", "User-Agent": "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) Gecko/20091102 Firefox/3.5.5 (.NET CLR 3.5.30729)"}
+#     data = requests.get(url)
+#     print(data.text)
+#     assert data.status_code == 200
+#     soup = BeautifulSoup(data.text, 'html.parser')
+#     apartments = soup.find_all("a", href=lambda href: href and "https://r.onliner.by/ak/apartments/" in href)
+#     for i in apartments:
+#         print("A: " + str(i))
+#         print("-----------------")
+#     # apartments = div.select("a[href*=https://r.onliner.by/ak/apartments/]")
