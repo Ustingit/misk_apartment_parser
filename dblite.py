@@ -73,7 +73,32 @@ class ApartmentsDb:
             print("ZAPIS S TAKIM AIDI UCHE EST!")
             self.cursor.execute('select * from apartments where id = {id}'.format(id=ap_id))
             print(self.cursor.fetchall())
-            print("ZAPIS S TAKIM AIDI UCHE EST!END")
+
+    def add_apartment(self, flat):
+        """Add apartment to database
+
+        Args:
+            flat: object of class Flat
+
+        Returns:
+            ap_id: id of added apartment.
+        """
+        try:
+            self.cursor.execute('INSERT INTO apartments '
+                                '(id, url, price, phone, ap_name, owner, about) '
+                                'VALUES({id}, "{url}", "{price}", "{phone}", '
+                                '"{ap_name}", "{owner}", "{about}")'.format(id=flat.ap_id,
+                                                                            url=flat.url,
+                                                                            price=flat.price,
+                                                                            phone=flat.phone,
+                                                                            ap_name=flat.ap_name,
+                                                                            owner=flat.owner,
+                                                                            about=flat.about))
+            self.con.commit()
+        except sqlite3.IntegrityError:
+            print("ZAPIS S TAKIM AIDI UCHE EST!")
+            self.cursor.execute('select * from apartments where id = {id}'.format(id=flat.ap_id))
+            print(self.cursor.fetchall())
 
     def get_apartments(self):
         """Method to get all apartments from BD"""
