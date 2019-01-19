@@ -7,6 +7,7 @@ import os
 import dblite
 #import unixNotifier
 import flat
+import mssqlProvider.mssqlProvider as database
 
 
 def parse_kvartirant_apartments():
@@ -23,6 +24,10 @@ def parse_kvartirant_apartments():
 
     db = dblite.ApartmentsDb()
     exist_aps = db.get_exist_apartments_ids()
+
+    newDB = database.ApartmentsDb()
+    existingApartmentsIds = newDB.get_exist_apartments_ids()
+
     try:
         i = 1
         for apartment in apartments:
@@ -32,34 +37,26 @@ def parse_kvartirant_apartments():
                     bad_apartment = apartment
                     title = apartment.find("p", class_="title")
                     ap_url = title.find("a")['href']
+                    current_flat.ap_url = ap_url
                     current_flat.ap_id = int(ap_url.split("id")[1].replace("/", "", 2).replace('"', '').replace("'", ""))
-                    log.write(str(i) + ") " + str(ap_url) + "\n")
-                    log.write("apartment id: " + str(current_flat.ap_id) + "\n")
                     current_flat.price = title.find("span").contents[0]
-                    #log.write("price: " + str(current_flat.price) + "\n")
                     current_flat.ap_name = title.find("a").contents[0].replace('"', '').replace("'", "")
-                    log.write("name: " + str(current_flat.ap_name) + "\n")
                     current_flat.owner = apartment.find("span", class_="phones").parent.contents[1]
-                    log.write("owner: " + str(current_flat.owner) + "\n")
-                    log.write("about: ")
                     current_flat.about = (''.join(str(p.contents[0]).replace('<span class="rooms">', '')
                                 .replace('</span>', '').strip() for p in apartment.findAll("p", class_=None)[:-1]))\
                                 .replace('"', '', 100).replace("'", "", 100)
-                    log.write(current_flat.about)
                     current_flat.phone = apartment.find("span", class_="phones").find("img")['src']
-                    log.write("tel: " + str(current_flat.phone) + "\n")
-                    log.write("\n------------------------------\n")
                     i += 1
                     if current_flat.ap_id not in exist_aps:
                         db.add_apartment(current_flat)
+
+
                 except Exception as ex:
                     log.write(str(ex))
 
     except AttributeError:
-        log.write("\n\n")
-        log.write("!!!!!!!!!!!!!!!!!!!!!!!!! SOMETHING WENT WRONG WITH APARTMENT:\n")
-        log.write(str(bad_apartment))
-        log.write("!!!!!!!!!!!!!!!!!!!!!!!!!  \n\n")
+        log.write("\n\n!!!!!!!!!!!!!!!!!!!!!!!!! SOMETHING WENT WRONG WITH APARTMENT:\n")
+        log.write(str(bad_apartment) + "!!!!!!!!!!!!!!!!!!!!!!!!!  \n\n")
     finally:
         log.close()
         db.con.close()
