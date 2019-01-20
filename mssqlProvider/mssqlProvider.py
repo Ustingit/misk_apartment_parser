@@ -48,36 +48,6 @@ class ApartmentsDb:
         self.cursor.execute('select * from apartments where id = {id}'.format(id=id))
         return self.cursor.fetchall()
 
-    def add_apartment(self, ap_id, url=None, price=None, phone=None, ap_name=None, owner=None, about=None):
-        """Add apartment to database
-
-        Args:
-            ap_id:
-            url:
-            price:
-            phone:
-            ap_name:
-            owner:
-            about:
-
-        Returns:
-            ap_id: id of added apartment.
-        """
-        try:
-            self.cursor.execute('INSERT INTO apartments '
-                                '(id, url, price, phone, ap_name, owner, about) '
-                                'VALUES({id}, "{url}", "{price}", "{phone}", '
-                                '"{ap_name}", "{owner}", "{about}")'.format(id=ap_id,
-                                                                            url=url,
-                                                                            price=price,
-                                                                            phone=phone,
-                                                                            ap_name=ap_name,
-                                                                            owner=owner,
-                                                                            about=about))
-            self.con.commit()
-        except pyodbc.IntegrityError:
-            print("\n\nZAPIS S TAKIM AIDI UCHE EST!: " + self.get_apartment_by_id(ap_id) + "\n\n")
-
     def add_apartment(self, flat):
         """Add apartment to database
 
@@ -87,67 +57,70 @@ class ApartmentsDb:
         Returns:
             ap_id: id of added apartment.
         """
-        try:
-            self.cursor.execute('INSERT INTO apartments '
-                                '(Name,'
-                                ' Author,'
-                                ' Price,'
-                                ' Phone,'
-                                ' Description,'
-                                ' DateCreated,'
-                                ' DateActualTo,'
-                                ' IsActive, IsDonated,'
-                                ' ParsingSource,'
-                                ' ShortId,'
-                                ' SourceURL,'
-                                ' mainPhotoUrl,'
-                                ' photosListUrls) '
-                                'VALUES '
-                                '({name},'
-                                ' "{author}", '
-                                '"{price}", '
-                                '"{phone}", '
-                                '"{phoneImgBinary}", '
-                                '"{mainApPhotoBinary}", '
-                                '"{creationDate}", '
-                                '"{actualToDate}", '
-                                '"{isActive}", '
-                                '"{isDonated}", '
-                                '"{donateDueDate}", '
-                                '"{internalComment}", '
-                                '"{clientId}", '
-                                '"{parsingSource}", '
-                                '"{shortId}", '
-                                '"{mainPhotoUrl}", "{photosListUrls}")'.format(name=flat.name,
-                                                                               author=flat.author,
-                                                                               price=flat.price,
-                                                                               phone=flat.phone,
-                                                                               description=flat.description,
-                                                                               phoneImgBinary=flat.phoneImgBinary,
-                                                                               mainApPhotoBinary=flat.mainApPhotoBinary,
-                                                                               creationDate=flat.creationDate,
-                                                                               actualToDate=flat.actualToDate,
-                                                                               isActive=flat.isActive,
-                                                                               isDonated=flat.isDonated,
-                                                                               donateDueDate=flat.donateDueDate,
-                                                                               internalComment=flat.internalComment,
-                                                                               clientId=flat.clientId,
-                                                                               parsingSource=flat.parsingSource,
-                                                                               shortId=flat.shortId,
-                                                                               mainPhotoUrl=flat.mainPhotoUrl,
-                                                                               photosListUrls=flat.photosListUrls))
-            self.con.commit()
-        except pyodbc.IntegrityError:
-            print("\n\nZAPIS S TAKIM AIDI UCHE EST!: " + self.get_apartment_by_id(flat.ap_id) + "\n\n")
+        query = """INSERT INTO apartments (Name, Author, Price, Phone, Description, DateCreated, DateActualTo, 
+        IsActive, IsDonated, DonateDueDate, InternalComment, ClientId, ParsingSource, ShortId, SourceURL, 
+        mainPhotoUrl, photosListUrls, phoneImgURL) VALUES ({name}, {author}, {price}, {phone},{description}, 
+        {creationDate}, {actualToDate}, {isActive}, {isDonated}, {donateDueDate}, {internalComment}, 
+        {clientId}, {parsingSource}, {shortId}, {sourceURL}, {mainPhotoUrl}, {photosListUrls}, 
+        {phoneImgURL})""".format(name=flat.name,
+                                 author=flat.author,
+                                 price=flat.price,
+                                 phone=flat.phone,
+                                 description=flat.description,
+                                 creationDate=flat.creationDate,
+                                 actualToDate=flat.actualToDate,
+                                 isActive=flat.isActive,
+                                 isDonated=flat.isDonated,
+                                 donateDueDate=flat.donateDueDate,
+                                 internalComment=flat.internalComment,
+                                 clientId=flat.clientId,
+                                 parsingSource=flat.parsingSource,
+                                 shortId=flat.shortId,
+                                 mainPhotoUrl=flat.mainPhotoUrl,
+                                 photosListUrls=flat.photosListUrls,
+                                 sourceURL=flat.sourceURL,
+                                 phoneImgURL=flat.phoneImgURL)
+        qew = """INSERT INTO apartments (Name, Author, Price, Phone, Description, DateCreated, DateActualTo, 
+        IsActive, IsDonated, DonateDueDate, InternalComment, ClientId, ParsingSource, ShortId, SourceURL, 
+        mainPhotoUrl, photosListUrls, phoneImgURL) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
+        asdf = (qew % (self.getValueOrNull(flat.name), self.getValueOrNull(flat.author),
+                       self.getValueOrNull(flat.price), flat.phone, self.getValueOrNull(flat.description),
+                       self.getValueOrNull(flat.creationDate), self.getValueOrNull(flat.actualToDate), flat.isActive,
+                       flat.isDonated,
+                       self.getValueOrNull(flat.donateDueDate), self.getValueOrNull(flat.internalComment),
+                       flat.clientId,
+                       flat.parsingSource,
+                       self.getValueOrNull(flat.shortId), self.getValueOrNull(flat.mainPhotoUrl),
+                       self.getValueOrNull(flat.photosListUrls), self.getValueOrNull(flat.sourceURL),
+                       self.getValueOrNull(flat.phoneImgURL)))
+        self.cursor.execute(asdf)
+        self.con.commit()
 
     def get_apartments(self):
         """Method to get all apartments from BD"""
         self.cursor.execute('SELECT * FROM apartments')
-        self.con.commit()
         return self.cursor.fetchall()
 
     def get_exist_apartments_ids(self):
         """Method to get apartment's ids from BD"""
         self.cursor.execute('SELECT id FROM apartments')
-        self.con.commit()
         return [i[0] for i in self.cursor.fetchall()]
+
+    def get_exist_apartments_short_ids(self):
+        """Method to get apartment's ids from BD"""
+        self.cursor.execute('SELECT ShortId FROM apartments')
+        return [i[0] for i in self.cursor.fetchall()]
+
+    def add_unpased_apartment(self, unparsed_flat):
+        """Method to get all apartments from BD"""
+        asd = """INSERT INTO UnparsedApartments (URL ,HTML ,ErrorDate ,Exception) 
+                               VALUES ('{URL}', '{HTML}', '{ErrorDate}', '{Exception}')""".format(
+            URL=unparsed_flat.URL,
+            HTML=unparsed_flat.HTML,
+            ErrorDate=unparsed_flat.ErrorDate,
+            Exception=unparsed_flat.Exception)
+        self.cursor.execute(asd)
+        self.con.commit()
+
+    def getValueOrNull(self, value):
+        return "'" + value + "'" if value else "'" + str(value) + "'"
