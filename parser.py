@@ -19,7 +19,7 @@ def parse_kvartirant_apartments():
     apartments = soup.find("table", class_="ads_list_table").findAll("tr")
 
     log = open(os.getcwd() + "/parser_log.txt", "w")
-    log.write("TRY " + str(datetime.now().strftime('%Y-%m-%d %H:%M:%S')) + "\n\n\n")
+    log.write(str(datetime.now().strftime('%Y-%m-%d %H:%M:%S')) + "\n\n\n")
     bad_apartment = None
     global_ap_url = None
 
@@ -68,10 +68,7 @@ def parse_kvartirant_apartments():
         log.write("\n\n!!! SOMETHING WENT WRONG WITH APARTMENT:\n" + str(bad_apartment) + "!!!\n\n")
     finally:
         log.close()
-        db.con.close()
-
-
-def qwe(): pass
+        newDB.con.close()
 
 
 if __name__ == '__main__':
