@@ -57,7 +57,7 @@ class ApartmentsDb:
         Returns:
             ap_id: id of added apartment.
         """
-        query = """INSERT INTO apartments (Name, Author, Price, Phone, Description, DateCreated, DateActualTo, 
+        query = """INSERT INTO TempApartments (Name, Author, Price, Phone, Description, DateCreated, DateActualTo, 
         IsActive, IsDonated, DonateDueDate, InternalComment, ClientId, ParsingSource, ShortId, SourceURL, 
         mainPhotoUrl, photosListUrls, phoneImgURL) VALUES ({name}, {author}, {price}, {phone},{description}, 
         {creationDate}, {actualToDate}, {isActive}, {isDonated}, {donateDueDate}, {internalComment}, 
@@ -80,7 +80,7 @@ class ApartmentsDb:
                                  photosListUrls=flat.photosListUrls,
                                  sourceURL=flat.sourceURL,
                                  phoneImgURL=flat.phoneImgURL)
-        qew = """INSERT INTO apartments (Name, Author, Price, Phone, Description, DateCreated, DateActualTo, 
+        qew = """INSERT INTO TempApartments (Name, Author, Price, Phone, Description, DateCreated, DateActualTo, 
         IsActive, IsDonated, DonateDueDate, InternalComment, ClientId, ParsingSource, ShortId, SourceURL, 
         mainPhotoUrl, photosListUrls, phoneImgURL) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
         asdf = (qew % (self.getValueOrNull(flat.name), self.getValueOrNull(flat.author),
@@ -108,7 +108,7 @@ class ApartmentsDb:
 
     def get_exist_apartments_short_ids(self):
         """Method to get apartment's ids from BD"""
-        self.cursor.execute('SELECT ShortId FROM apartments')
+        self.cursor.execute('SELECT ShortId FROM TempApartments')
         return [i[0] for i in self.cursor.fetchall()]
 
     def add_unpased_apartment(self, unparsed_flat):
